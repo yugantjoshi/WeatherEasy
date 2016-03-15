@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Weather Easy</string>
+    <string name="city_text">City</string>
+    <string name="conditions_text">Conditions</string>
+    <string name="pressure_text">Pressure</string>
+    <string name="humidity_text">Humidity</string>
+</resources>
