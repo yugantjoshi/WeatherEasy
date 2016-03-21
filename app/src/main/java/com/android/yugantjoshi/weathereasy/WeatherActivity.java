@@ -1,5 +1,7 @@
 package com.android.yugantjoshi.weathereasy;
 
+import android.location.Location;
+import android.location.LocationListener;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -7,6 +9,12 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.android.yugantjoshi.weathereasy.models.WeatherData;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+
+import org.w3c.dom.Text;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -14,10 +22,15 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class WeatherActivity extends AppCompatActivity {
+public class WeatherActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener, LocationListener{
     public static final String BASE_URL = "http://api.openweathermap.org";
-    TextView city_text, conditions_text, humidity_text, pressure_text;
+    TextView city_text, conditions_text, humidity_text, pressure_text, lat_text, lon_text;
     Button weatherButton;
+    private GoogleApiClient googleApiClient;
+    private LocationRequest locationRequest;
+    Location lastLocation;
+    String lat, lon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +42,8 @@ public class WeatherActivity extends AppCompatActivity {
         humidity_text = (TextView) findViewById(R.id.humidity_text);
         pressure_text = (TextView) findViewById(R.id.pressure_text);
         weatherButton = (Button) findViewById(R.id.weather_button);
+        lat_text = (TextView) findViewById(R.id.lat_text);
+        lon_text = (TextView) findViewById(R.id.lon_text);
 
         weatherButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -38,6 +53,15 @@ public class WeatherActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    synchronized void buildGoogleApiClient()
+    {
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
     }
 
     public void getWeatherUpdateCall()
@@ -78,4 +102,64 @@ public class WeatherActivity extends AppCompatActivity {
         });
 
     }
+
+    @Override
+    public void onConnected(Bundle bundle)
+    {
+        locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+
+        lastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                googleApiClient);
+        if (lastLocation != null) {
+            lat = String.valueOf(lastLocation.getLatitude());
+            lon = String.valueOf(lastLocation.getLongitude());
+
+            lat_text.setText("Latitude: "+lat);
+            lon_text.setText("Longitude: "+lon);
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        googleApiClient.connect();
+    }
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        googleApiClient.disconnect();
+    }
+
 }

@@ -28,6 +28,5 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta4'
     compile 'com.squareup.okhttp3:okhttp:3.1.2'
     provided 'org.glassfish:javax.annotation:10.0-b28'
-
-
+    compile 'com.google.android.gms:play-services:8.1.0'
 }
