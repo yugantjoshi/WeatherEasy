@@ -4,8 +4,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,8 +13,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import org.w3c.dom.Text;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -25,7 +21,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class WeatherActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener{
-    public static final String BASE_URL = "http://api.openweathermap.org";
+    public static final String BASE_URL = "http://api.openweathermap.org/data/2.5/";
     TextView city_text, conditions_text, humidity_text, pressure_text, lat_text, lon_text, temp_text;
     private GoogleApiClient googleApiClient;
     private LocationRequest locationRequest;
@@ -73,7 +69,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
                 city = response.body().getName();
                 conditions = response.body().getWeather().get(0).getDescription();
                 humidity = response.body().getMain().getHumidity().toString();
-                pressure = response.body().getMain().getPressure().toString();
+                pressure = String.valueOf(response.body().getMain().getPressure());
                 temperature = response.body().getMain().getTemp().toString();
 
                 city_text.setText("City: " + city);
