@@ -4,12 +4,13 @@ import com.android.yugantjoshi.weathereasy.models.WeatherData;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Query;
 
 /**
  * Created by yugantjoshi on 3/14/16.
  */
 public interface WeatherServiceInterface
 {
-    @GET("/data/2.5/weather?q=New York,ny&appid=37c55f8b0f66c94308d9635209bd7b4c")
-    Call<WeatherData> getCurrentWeather();
+    @GET("/data/2.5/weather?appid=37c55f8b0f66c94308d9635209bd7b4c")
+    Call<WeatherData> getCurrentWeather(@Query("lat") double lat, @Query("lon") double lon);
 }

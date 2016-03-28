@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.yugantjoshi.weathereasy.models.WeatherData;
 import com.google.android.gms.common.ConnectionResult;
@@ -25,43 +26,30 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class WeatherActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener{
     public static final String BASE_URL = "http://api.openweathermap.org";
-    TextView city_text, conditions_text, humidity_text, pressure_text, lat_text, lon_text;
-    Button weatherButton;
+    TextView city_text, conditions_text, humidity_text, pressure_text, lat_text, lon_text, temp_text;
     private GoogleApiClient googleApiClient;
     private LocationRequest locationRequest;
     Location lastLocation;
     String lat, lon;
+    double latitude, longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
+        buildGoogleApiClient();
 
         city_text = (TextView) findViewById(R.id.city_text);
+        temp_text = (TextView) findViewById(R.id.temp_text);
         conditions_text = (TextView) findViewById(R.id.conditions_text);
         humidity_text = (TextView) findViewById(R.id.humidity_text);
         pressure_text = (TextView) findViewById(R.id.pressure_text);
-        weatherButton = (Button) findViewById(R.id.weather_button);
         lat_text = (TextView) findViewById(R.id.lat_text);
         lon_text = (TextView) findViewById(R.id.lon_text);
 
-        weatherButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getWeatherUpdateCall();
-            }
-        });
+        getWeatherUpdateCall();
 
 
-    }
-
-    synchronized void buildGoogleApiClient()
-    {
-        googleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
     }
 
     public void getWeatherUpdateCall()
@@ -75,32 +63,41 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
         // the MyApiEndpointInterface interface with the defined endpoints:
         WeatherServiceInterface weatherService = retrofit.create(WeatherServiceInterface.class);
 
-        Call<WeatherData> weatherCall = weatherService.getCurrentWeather();
+        Call<WeatherData> weatherCall = weatherService.getCurrentWeather(latitude,longitude);
 
         //Execute the call
         weatherCall.enqueue(new Callback<WeatherData>() {
             @Override
-            public void onResponse(Call<WeatherData> call, Response<WeatherData> response)
-            {
-                String city, conditions, humidity, pressure;
+            public void onResponse(Call<WeatherData> call, Response<WeatherData> response) {
+                String city, conditions, humidity, pressure, temperature;
                 city = response.body().getName();
                 conditions = response.body().getWeather().get(0).getDescription();
                 humidity = response.body().getMain().getHumidity().toString();
                 pressure = response.body().getMain().getPressure().toString();
+                temperature = response.body().getMain().getTemp().toString();
 
-                city_text.setText("City: "+city);
-                conditions_text.setText("Conditions: "+conditions);
-                humidity_text.setText("Humidity: "+humidity);
-                pressure_text.setText("Pressure: "+pressure);
-
+                city_text.setText("City: " + city);
+                temp_text.setText("Current Temperature: "+temperature);
+                conditions_text.setText("Conditions: " + conditions);
+                humidity_text.setText("Humidity: " + humidity);
+                pressure_text.setText("Pressure: " + pressure);
             }
 
             @Override
             public void onFailure(Call<WeatherData> call, Throwable t) {
+                Toast.makeText(WeatherActivity.this, R.string.update_fail, Toast.LENGTH_LONG).show();
                 t.printStackTrace();
             }
         });
+    }
 
+    synchronized void buildGoogleApiClient()
+    {
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
     }
 
     @Override
@@ -108,16 +105,21 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     {
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-
+        //Update every hour and half
+        locationRequest.setInterval(5400000);
+        LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         lastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 googleApiClient);
         if (lastLocation != null) {
             lat = String.valueOf(lastLocation.getLatitude());
             lon = String.valueOf(lastLocation.getLongitude());
+            latitude = Double.parseDouble(lat);
+            longitude = Double.parseDouble(lon);
 
-            lat_text.setText("Latitude: "+lat);
-            lon_text.setText("Longitude: "+lon);
+            lat_text.setText("Latitude: " + lat);
+            lon_text.setText("Longitude: " + lon);
         }
+
     }
 
     @Override

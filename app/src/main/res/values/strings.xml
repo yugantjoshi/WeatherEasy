@@ -4,4 +4,8 @@
     <string name="conditions_text">Conditions</string>
     <string name="pressure_text">Pressure</string>
     <string name="humidity_text">Humidity</string>
+    <string name="temp_text">Current Temperature</string>
+    <string name="update_fail">Please try again later</string>
+
+    <string name="google_app_id">AIzaSyDxxhzFXnBEbLisOqPbElLwwu1BuGqyH-U</string>
 </resources>
