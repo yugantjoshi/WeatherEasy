@@ -8,7 +8,7 @@ import javax.annotation.Generated;
 public class Main {
 
     private Double temp;
-    private Integer pressure;
+    private float pressure;
     private Integer humidity;
     private Double tempMin;
     private Double tempMax;
@@ -37,7 +37,7 @@ public class Main {
      * @return
      * The pressure
      */
-    public Integer getPressure() {
+    public float  getPressure() {
         return pressure;
     }
 
