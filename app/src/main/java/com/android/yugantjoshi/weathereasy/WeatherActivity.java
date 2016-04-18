@@ -2,6 +2,7 @@ package com.android.yugantjoshi.weathereasy;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Build;
@@ -12,12 +13,20 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.yugantjoshi.weathereasy.models.Weather;
 import com.android.yugantjoshi.weathereasy.models.WeatherData;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
+import net.steamcrafted.materialiconlib.MaterialIconView;
+
+import org.w3c.dom.Text;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -26,26 +35,50 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class WeatherActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener{
+
     public static final String BASE_URL = "http://api.openweathermap.org/data/2.5/";
-    TextView latitude_text, longitude_text, temp_text, humidity_text;
-    private static final int REQUEST_LOCATION = 1888;
-    private GoogleApiClient googleApiClient;
-    private LocationRequest locationRequest;
-    Location lastLocation;
+
+    @Bind(R.id.temp_text) TextView temp_text;
+    @Bind(R.id.humidity_text) TextView humidity_text;
+    @Bind(R.id.city_text) TextView city_text;
+    @Bind(R.id.wind_text) TextView wind_text;
+    @Bind(R.id.hilo_text) TextView hilo_text;
+    @Bind(R.id.weather_icon) MaterialIconView weather_icon;
+    @Bind(R.id.water_icon) MaterialIconView water_icon;
+    @Bind(R.id.rain_percentage) TextView rain_percentage;
+
+    Typeface lightFont;
+
     String lat, lon;
     double latitude, longitude;
+
+    private static final int REQUEST_LOCATION = 1888;
+    private GoogleApiClient googleApiClient;
+    Location lastLocation;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
+
         buildGoogleApiClient();
+        ButterKnife.bind(this);
 
-        latitude_text = (TextView) findViewById(R.id.lat_text);
-        longitude_text = (TextView) findViewById(R.id.lon_text);
-        temp_text = (TextView)findViewById(R.id.temp_text);
-        humidity_text =(TextView)findViewById(R.id.humidity_text);
+        lightFont = Typeface.createFromAsset(getAssets(),"fonts/OpenSans-Light.ttf");
 
+        temp_text.setTypeface(lightFont);
+        city_text.setTypeface(lightFont);
+        hilo_text.setTypeface(lightFont);
+        rain_percentage.setTypeface(lightFont);
+
+    }
+    /*
+    Loads the proper weather icon based on description
+     */
+    private void changeWeatherIcon()
+    {
+        //weather_icon.setIcon(MaterialDrawableBuilder.IconValue.WEATHER_CLOUDY);
     }
 
     public void getWeatherUpdateCall(double latitude, double longitude)
@@ -65,10 +98,17 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
             public void onResponse(Call<WeatherData> call, Response<WeatherData> response) {
 
                 String humidity = String.valueOf(response.body().getMain().getHumidity());
-                String temperature = String.valueOf(response.body().getMain().getTemp());
+                String wind = String.valueOf(response.body().getWind().getSpeed());
+                String city = String.valueOf(response.body().getName());
+                String temp = String.valueOf(response.body().getMain().getTemp());
 
-                temp_text.setText("Current Temperature: "+temperature);
-                humidity_text.setText("Humidity: " + humidity);
+                double temp_double = Double.parseDouble(temp);
+                double temp_conv = (9.0/5.0)*(temp_double-273)+32;
+
+                city_text.setText(city);
+                humidity_text.setText("Humidity: " + humidity+"%");
+                wind_text.setText("Wind "+wind+" mph");
+                temp_text.setText(String.valueOf(temp_conv).substring(0,3)+"˚");
             }
 
             @Override
@@ -95,9 +135,9 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     public void onConnected(Bundle bundle)
     {
         Log.d("Connected", "Connected to API");
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             Log.d("Connected","IF STATEMENT");
 
@@ -131,10 +171,6 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
 
             Log.d("LATITUDE: ",lat);
             Log.d("LONGITUDE: ",lon);
-
-            latitude_text.setText(lat);
-            longitude_text.setText(lon);
-
         }
     }
 
@@ -184,8 +220,9 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
+    public void onConnectionFailed(ConnectionResult connectionResult)
+    {
+        Toast.makeText(WeatherActivity.this, R.string.update_fail, Toast.LENGTH_LONG).show();
     }
     @Override
     public void onStart()
