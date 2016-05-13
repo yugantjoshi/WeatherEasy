@@ -34,9 +34,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class WeatherActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener{
+        GoogleApiClient.OnConnectionFailedListener{
 
     public static final String BASE_URL = "http://api.openweathermap.org/data/2.5/";
+    protected static final String TAG = "MainActivity";
 
     @Bind(R.id.temp_text) TextView temp_text;
     @Bind(R.id.humidity_text) TextView humidity_text;
@@ -45,7 +46,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     @Bind(R.id.hilo_text) TextView hilo_text;
     @Bind(R.id.weather_icon) MaterialIconView weather_icon;
     @Bind(R.id.water_icon) MaterialIconView water_icon;
-    @Bind(R.id.rain_percentage) TextView rain_percentage;
+   // @Bind(R.id.rain_percentage) TextView rain_percentage;
 
     Typeface lightFont;
 
@@ -53,8 +54,8 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     double latitude, longitude;
 
     private static final int REQUEST_LOCATION = 1888;
-    private GoogleApiClient googleApiClient;
-    Location lastLocation;
+    protected GoogleApiClient googleApiClient;
+    protected Location lastLocation;
 
 
     @Override
@@ -62,15 +63,31 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
 
-        buildGoogleApiClient();
         ButterKnife.bind(this);
-
         lightFont = Typeface.createFromAsset(getAssets(),"fonts/OpenSans-Light.ttf");
 
         temp_text.setTypeface(lightFont);
         city_text.setTypeface(lightFont);
         hilo_text.setTypeface(lightFont);
-        rain_percentage.setTypeface(lightFont);
+
+
+
+        Log.d("Connected", "Check Permissions");
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    Toast.makeText(WeatherActivity.this, "Need to access Location", Toast.LENGTH_LONG).show();
+                }
+                Log.d("Connected", "REQUEST PERMISSIONS");
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
+            }
+        }
+
+        buildGoogleApiClient();
 
     }
     /*
@@ -106,8 +123,8 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
                 double temp_conv = (9.0/5.0)*(temp_double-273)+32;
 
                 city_text.setText(city);
-                humidity_text.setText("Humidity: " + humidity+"%");
-                wind_text.setText("Wind "+wind+" mph");
+                humidity_text.setText(humidity+"%");
+                wind_text.setText(wind+" mph");
                 temp_text.setText(String.valueOf(temp_conv).substring(0,3)+"˚");
             }
 
@@ -134,44 +151,19 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     @Override
     public void onConnected(Bundle bundle)
     {
-        Log.d("Connected", "Connected to API");
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            Log.d("Connected","IF STATEMENT");
 
+        lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+        if (lastLocation != null)
+        {
 
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if(shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION))
-                {
-                    Toast.makeText(WeatherActivity.this, "Need to access Location",Toast.LENGTH_LONG).show();
-                }
-                Log.d("Connected","REQUEST PERMISSIONS");
-                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
-            }
-        }
-
-        Log.d("Connected","AFTER IF STATEMENT");
-        Log.d("Connected","GETTING LOCATION");
-        lastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                googleApiClient);
-        Log.d("Connected","GOT LOCATION");
-        if (lastLocation != null) {
-            Log.d("Connected","GETTING LOCATION");
-            lat = String.valueOf(lastLocation.getLatitude());
-            lon = String.valueOf(lastLocation.getLongitude());
-            Log.d("Connected","WE HAVE COORDINATES!");
-
-            latitude = Double.valueOf(lat);
-            longitude = Double.valueOf(lon);
-
+            latitude = lastLocation.getLatitude();
+            longitude = lastLocation.getLongitude();
             getWeatherUpdateCall(latitude,longitude);
 
-            Log.d("LATITUDE: ",lat);
-            Log.d("LONGITUDE: ",lon);
+        } else {
+            Toast.makeText(this, R.string.update_fail, Toast.LENGTH_LONG).show();
         }
+
     }
 
     @Override
@@ -200,26 +192,6 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     }
 
     @Override
-    public void onLocationChanged(Location location) {
-
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
-
-    @Override
     public void onConnectionFailed(ConnectionResult connectionResult)
     {
         Toast.makeText(WeatherActivity.this, R.string.update_fail, Toast.LENGTH_LONG).show();
@@ -236,7 +208,9 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     {
 
         super.onPause();
-        googleApiClient.disconnect();
+        if (googleApiClient.isConnected()) {
+            googleApiClient.disconnect();
+        }
     }
 
 }
