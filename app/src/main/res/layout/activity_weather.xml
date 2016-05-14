@@ -17,7 +17,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/city_text"
-        tools:text="Piscataway"
+        tools:text="Metuchen"
         android:textColor="#ECEFF1"
         android:textSize="40sp"
         android:layout_gravity="center" />
@@ -97,7 +97,7 @@
             android:id="@+id/wind_text"
             android:layout_marginTop="10dp"
             android:textSize="20dp"
-            tools:text="3%"
+            tools:text="3 mph"
             android:textColor="#ECEFF1" />
 
 
