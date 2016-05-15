@@ -53,8 +53,6 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     TextView city_text;
     @Bind(R.id.wind_text)
     TextView wind_text;
-    @Bind(R.id.hilo_text)
-    TextView hilo_text;
     @Bind(R.id.weather_icon)
     MaterialIconView weather_icon;
     @Bind(R.id.water_icon)
@@ -79,7 +77,6 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
 
         temp_text.setTypeface(lightFont);
         city_text.setTypeface(lightFont);
-        hilo_text.setTypeface(lightFont);
 
 
         Log.d("Connected", "Check Permissions");
@@ -172,8 +169,6 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
 
                 changeWeatherIcon(conditions);
 
-                hilo_text.setText(String.valueOf(response.body().getMain().getTempMax())
-                        + "˚/" + String.valueOf(response.body().getMain().getTempMin()) + "˚");
                 humidity_text.setText(String.valueOf(response.body().getMain().getHumidity()) + "%");
                 wind_text.setText(String.valueOf(windConv) + " mph");
                 temp_text.setText(String.valueOf(tempConv) + "˚");
@@ -186,7 +181,6 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
             }
         });
     }
-
 
     private void setLocation() {
         lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);

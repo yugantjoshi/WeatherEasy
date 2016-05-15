@@ -52,17 +52,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/hilo_text"
-            android:layout_margin="10dp"
-            android:textSize="20dp"
-            tools:text="67˚/42˚"
-            android:textColor="#ECEFF1" />
 
         <net.steamcrafted.materialiconlib.MaterialIconView
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginRight="5dp"
             android:layout_width="wrap_content"
