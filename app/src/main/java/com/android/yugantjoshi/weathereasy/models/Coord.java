@@ -2,6 +2,7 @@ package com.android.yugantjoshi.weathereasy.models;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.annotation.Generated;
 
 @Generated("org.jsonschema2pojo")
