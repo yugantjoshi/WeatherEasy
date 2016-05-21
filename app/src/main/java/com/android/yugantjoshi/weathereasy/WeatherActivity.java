@@ -169,13 +169,28 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
         //weather_icon.setIcon(MaterialDrawableBuilder.IconValue.WEATHER_CLOUDY);
         Log.d("Weather Icon", conditions);
         if (conditions.equalsIgnoreCase("rain")) {
-            weather_icon.setIcon(MaterialDrawableBuilder.IconValue.WEATHER_RAINY);
+            weather_icon.setIcon(MaterialDrawableBuilder.IconValue.WEATHER_POURING);
         } else if (conditions.equalsIgnoreCase("clouds")) {
             weather_icon.setIcon(MaterialDrawableBuilder.IconValue.WEATHER_CLOUDY);
         } else if (conditions.equalsIgnoreCase("clear")) {
             weather_icon.setIcon(MaterialDrawableBuilder.IconValue.WEATHER_SUNNY);
         } else if (conditions.equalsIgnoreCase("snow")) {
             weather_icon.setIcon(MaterialDrawableBuilder.IconValue.WEATHER_SNOWY);
+        }
+        else if (conditions.equalsIgnoreCase("fog")) {
+            weather_icon.setIcon(MaterialDrawableBuilder.IconValue.WEATHER_FOG);
+        }
+        else if (conditions.equalsIgnoreCase("hail")) {
+            weather_icon.setIcon(MaterialDrawableBuilder.IconValue.WEATHER_HAIL);
+        }
+        else if (conditions.equalsIgnoreCase("lightning")) {
+            weather_icon.setIcon(MaterialDrawableBuilder.IconValue.WEATHER_LIGHTNING);
+        }
+        else if (conditions.equalsIgnoreCase("partly cloudy")) {
+            weather_icon.setIcon(MaterialDrawableBuilder.IconValue.WEATHER_PARTLYCLOUDY);
+        }
+        else if (conditions.equalsIgnoreCase("windy")) {
+            weather_icon.setIcon(MaterialDrawableBuilder.IconValue.WEATHER_WINDY);
         }
     }
 
