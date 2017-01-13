@@ -20,7 +20,7 @@
             android:layout_marginTop="80dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#3498db"
+            android:background="#fff"
             android:gravity="center"
             android:orientation="vertical">
 
@@ -28,7 +28,7 @@
                 android:id="@+id/time_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#ECEFF1"
+                android:textColor="#343434"
                 android:textSize="40sp"
                 tools:text="12:30 PM" />
         </LinearLayout>
@@ -53,10 +53,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#e62836"
+        android:background="#3498db"
         android:orientation="vertical"
-        android:padding="10dp">
-
+        android:padding="0dp">
 
         <LinearLayout
             android:layout_marginBottom="10dp"
